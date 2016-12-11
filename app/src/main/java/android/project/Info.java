@@ -12,6 +12,17 @@ public class Info{
     private int isMusic;
 
 
+
+//    private int isRingtone;
+//
+//    public int getIsRingtone() {
+//        return isRingtone;
+//    }
+//
+//    public void setIsRingtone(int isRingtone) {
+//        this.isRingtone = isRingtone;
+//    }
+
     public void setId(long id){
         this.id = id;
     }

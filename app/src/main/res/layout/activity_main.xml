@@ -2,7 +2,7 @@
 <ViewFlipper xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/allFlipper"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent">
     <!-- 启动等待界面 -->
     <RelativeLayout
         android:id="@+id/splashLayout"
@@ -18,7 +18,8 @@
         android:id="@+id/homeLayout"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp">
+        android:paddingLeft="16dp"
+        android:background="@color/timecode_shadow">
     <ListView
         android:id="@+id/listview"
         android:layout_width="match_parent"

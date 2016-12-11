@@ -16,7 +16,7 @@
             android:layout_alignParentTop="true"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
-            android:textColor="#000"
+            android:textColor="#fff"
             android:textSize="17sp" />
         <TextView
             android:text="duration"
@@ -27,7 +27,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
             android:layout_margin="10dp"
-            android:textColor="#999" />
+            android:textColor="@color/type_bkgnd_unsupported" />
         <TextView
             android:text="artist"
             android:id="@+id/artist"
@@ -36,7 +36,6 @@
             android:layout_below="@id/title"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
-            android:textColor="#999" />
-
+            android:textColor="@color/type_bkgnd_unsupported" />
     </RelativeLayout>
 </RelativeLayout>

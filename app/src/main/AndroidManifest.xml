@@ -3,6 +3,7 @@
     package="android.project">
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
 
     <application
         android:allowBackup="true"
@@ -10,14 +11,28 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+
+        <!--主程序 音乐列表-->
+        <activity android:name=".MainActivity"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!--音乐播放器-->
         <activity android:name=".Player" />
+
+        <!--铃声修改页面-->
+        <activity android:name=".RingtoneEditActivity"
+            android:theme="@android:style/Theme.Holo"/>
+            <!--android:theme="@android:style/Theme.WithActionBar"/>-->
+
+
+
+
 
         <service
             android:name=".MusicService"
