@@ -14,7 +14,7 @@
 
         <!--主程序 音乐列表-->
         <activity android:name=".MainActivity"
-            >
+            android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,7 +23,8 @@
         </activity>
 
         <!--音乐播放器-->
-        <activity android:name=".Player" />
+        <activity android:name=".Player"
+            android:launchMode="singleInstance"/>
 
         <!--铃声修改页面-->
         <activity android:name=".RingtoneEditActivity"
@@ -31,7 +32,11 @@
             <!--android:theme="@android:style/Theme.WithActionBar"/>-->
 
 
-
+        <receiver android:name=".NotificationReceiver">
+            <intent-filter>
+                <action android:name="android.project.notification"/>
+            </intent-filter>
+        </receiver>
 
 
         <service

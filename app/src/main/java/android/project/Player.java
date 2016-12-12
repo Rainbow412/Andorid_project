@@ -4,12 +4,15 @@ import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.preference.DialogPreference;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +30,7 @@ public class Player extends AppCompatActivity {
     private Button play;
     private Button stop;
     private Button quit;
-    private MusicService ms;
+    private MusicService ms = null;
     private TextView state;
     private TextView current;
     private TextView total;
@@ -49,6 +52,22 @@ public class Player extends AppCompatActivity {
     private String title[];
     private int size;
 
+    private Intent intent;
+
+    private final class InnerOnCompletionListener implements MediaPlayer.OnCompletionListener {
+        @Override
+        public void onCompletion(MediaPlayer mp) {
+            if (position >= size-1){
+                state.setText("已停止");
+                play.setBackground(getResources().getDrawable(R.mipmap.play));
+                ms.stop();
+                seekBar.setProgress(0);
+            }
+            else
+                nextSong();
+
+        }
+    }
 
 
     final Handler handler = new Handler();
@@ -61,12 +80,14 @@ public class Player extends AppCompatActivity {
             total.setText(mt.format(ms.mp.getDuration()));
             seekBar.setProgress(ms.mp.getCurrentPosition());
             seekBar.setMax(ms.mp.getDuration());
-            if (ms.mp.getCurrentPosition()==ms.mp.getDuration()){
-                state.setText("已停止");
-                play.setBackground(getResources().getDrawable(R.mipmap.play));
-                ms.stop();
-                seekBar.setProgress(0);
-            }
+//            Log.d("getCurrentPosition", ""+ms.mp.getCurrentPosition());
+//            Log.d("getDuration", ""+ms.mp.getDuration());
+//            if (Math.abs(ms.mp.getCurrentPosition()-ms.mp.getDuration())<=120){
+//                state.setText("已停止");
+//                play.setBackground(getResources().getDrawable(R.mipmap.play));
+//                ms.stop();
+//                seekBar.setProgress(0);
+//            }
             seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -125,19 +146,28 @@ public class Player extends AppCompatActivity {
             artist[i]=String.valueOf(infos.get(i).getArtist());
         }
 
+
         final Intent mIntent=getIntent();
-        Bundle bundle=mIntent.getExtras();
-        position=bundle.getInt("position");
+        position=mIntent.getIntExtra("position",0);
+        Log.d("position in Player", ""+position);
+
         t.setText(title[position]);
         a.setText(artist[position]);
         url=u[position];
 
-        ms=new MusicService();
-        final Intent intent= new Intent(this, MusicService.class);
-        intent.putExtra("url",url);
+        intent= new Intent(this, MusicService.class);
+        Bundle bundle1 = new Bundle();
+        bundle1.putString("url", url);
+        bundle1.putString("title", title[position]);
+        bundle1.putString("artist", artist[position]);
+        bundle1.putInt("position", position);
+        intent.putExtras(bundle1);
+//        intent.putExtra("url",url);
         bindService(intent,sc,BIND_AUTO_CREATE);
         state.setText("正在播放");//初始状态，点击播放列表，马上播放
 
+
+        ms.mp.setOnCompletionListener(new InnerOnCompletionListener());// MediaPlay自动播放下一首
 
         play.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -169,17 +199,7 @@ public class Player extends AppCompatActivity {
                     Toast.makeText(Player.this, "再次点击，从最后一首开始播放", Toast.LENGTH_SHORT).show();
                     position=size;
                 } else {
-                    handler.removeCallbacks(runnable);
-                    unbindService(sc);
-                    position--;
-                    t.setText(title[position]);
-                    a.setText(artist[position]);
-                    state.setText("正在播放");
-                    play.setBackground(getResources().getDrawable(R.mipmap.pause));
-                    url = u[position];
-                    handler.post(runnable);
-                    intent.putExtra("url", url);
-                    bindService(intent, sc, BIND_AUTO_CREATE);
+                    preSong();
                 }
             }
         });
@@ -191,17 +211,7 @@ public class Player extends AppCompatActivity {
                     Toast.makeText(Player.this, "再次点击，从第一首开始播放", Toast.LENGTH_SHORT).show();
                     position=-1;
                 } else {
-                    handler.removeCallbacks(runnable);
-                    unbindService(sc);
-                    position++;
-                    t.setText(title[position]);
-                    a.setText(artist[position]);
-                    state.setText("正在播放");
-                    play.setBackground(getResources().getDrawable(R.mipmap.pause));
-                    url = u[position];
-                    handler.post(runnable);
-                    intent.putExtra("url", url);
-                    bindService(intent, sc, BIND_AUTO_CREATE);
+                    nextSong();
                 }
             }
         });
@@ -232,29 +242,31 @@ public class Player extends AppCompatActivity {
         });
     }
 
+
+
     //按返回键1次：返回列表；连续按2次，退出程序。
     //对系统返回键进行监听,定义一个变量记录按键时间,通过计算时间差来实现该功能
-    private long mExitTime;
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
-            if ((System.currentTimeMillis() - mExitTime) > 2000) {
-                Toast.makeText(this, "再按一次退出应用", Toast.LENGTH_SHORT).show();
-                mExitTime = System.currentTimeMillis();
-                ms.mp.stop();
-                Player.this.finish();
-                //System.exit(0);
-            } else {
-                handler.removeCallbacks(runnable);
-                unbindService(sc);
-                Intent intent = getIntent();
-                setResult(1, intent);
-                finish();
-            }
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-
+//    private long mExitTime;
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+//            if ((System.currentTimeMillis() - mExitTime) > 2000) {
+//                Toast.makeText(this, "再按一次退出应用", Toast.LENGTH_SHORT).show();
+//                mExitTime = System.currentTimeMillis();
+//                ms.mp.stop();
+//                Player.this.finish();
+//                //System.exit(0);
+//            } else {
+//                handler.removeCallbacks(runnable);
+//                unbindService(sc);
+//                Intent intent = getIntent();
+//                setResult(1, intent);
+//                finish();
+//            }
+//            return true;
+//        }
+//        return super.onKeyDown(keyCode, event);
+//    }
+    @Override
     public void onDestroy() {
         Intent intent = getIntent();
         setResult(0, intent);
@@ -276,4 +288,57 @@ public class Player extends AppCompatActivity {
         //seekBar.setMax(ms.mp.getDuration());
         super.onResume();
     }
+
+    void nextSong(){
+        handler.removeCallbacks(runnable);
+        unbindService(sc);
+        position++;
+        t.setText(title[position]);
+        a.setText(artist[position]);
+        state.setText("正在播放");
+        play.setBackground(getResources().getDrawable(R.mipmap.pause));
+        url = u[position];
+        handler.post(runnable);
+        Bundle bundle1 = new Bundle();
+        bundle1.putString("url", url);
+        bundle1.putString("title", title[position]);
+        bundle1.putString("artist", artist[position]);
+        bundle1.putInt("position", position);
+        intent.putExtras(bundle1);
+//        intent.putExtra("url", url);
+        bindService(intent, sc, BIND_AUTO_CREATE);
+    }
+
+    void preSong(){
+        handler.removeCallbacks(runnable);
+        unbindService(sc);
+        position--;
+        t.setText(title[position]);
+        a.setText(artist[position]);
+        state.setText("正在播放");
+        play.setBackground(getResources().getDrawable(R.mipmap.pause));
+        url = u[position];
+        handler.post(runnable);
+        Bundle bundle1 = new Bundle();
+        bundle1.putString("url", url);
+        bundle1.putString("title", title[position]);
+        bundle1.putString("artist", artist[position]);
+        bundle1.putInt("position", position);
+        intent.putExtras(bundle1);
+//        intent.putExtra("url", url);
+        bindService(intent, sc, BIND_AUTO_CREATE);
+    }
+
+    //仅当activity为task根（即首个启动activity）时才生效 这个方法不会改变task中的activity状态，
+    // 按下返回键的作用跟按下HOME效果一样；重新点击应用还是回到应用退出前的状态；
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+            moveTaskToBack(true);
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+
 }

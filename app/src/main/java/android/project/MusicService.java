@@ -10,6 +10,7 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
 
 import java.io.File;
@@ -19,13 +20,25 @@ import java.util.List;
 public class MusicService extends Service {
     public static MediaPlayer mp=new MediaPlayer();
     private String path;
+    private String title;
+    private String artist;
+    private int position;
     //private String position;
+
+
+    private String NOTIACTION = "android.project.notification";
 
 
     public final IBinder binder=new MyBinder();
     @Override
     public IBinder onBind(Intent intent) {
-        path=intent.getStringExtra("url");
+//        path=intent.getStringExtra("url");
+        Bundle bundle = intent.getExtras();
+        path = bundle.getString("url");
+        title = bundle.getString("title");
+        artist = bundle.getString("artist");
+        position = bundle.getInt("position");
+
         //position=intent.getStringExtra("position");
         //System.out.println("sevice---------------"+path);
 
@@ -34,6 +47,7 @@ public class MusicService extends Service {
             mp.setDataSource(path);
             mp.prepare();
             mp.start();
+            notificationBroadcast();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -41,6 +55,7 @@ public class MusicService extends Service {
     }
     public class MyBinder extends Binder {
         MusicService getService(){
+
             return MusicService.this;
         }
     }
@@ -79,6 +94,18 @@ public class MusicService extends Service {
             }
         }
     }
+
+    void notificationBroadcast(){
+        Intent intent = new Intent(NOTIACTION);
+        Bundle bundle = new Bundle();
+        bundle.putString("title", title);
+        bundle.putString("artist", artist);
+        bundle.putInt("position", position);
+        intent.putExtras(bundle);
+        sendBroadcast(intent);
+    }
+
+
 
     /*public void next() {
         if(mp != null && musicIndex < 3) {
