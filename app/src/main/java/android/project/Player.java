@@ -1,9 +1,14 @@
 package android.project;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.IBinder;
@@ -30,6 +35,9 @@ import java.util.List;
 
 
 public class Player extends AppCompatActivity  {
+
+    private SensorManager mSensorManager;
+    private Sensor mAccelerometerSensor;
 
     private String CACELNOTI = "android.project.cancelnotification";
 
@@ -59,6 +67,50 @@ public class Player extends AppCompatActivity  {
     private int size;
 
     private Intent intent;
+
+    public static final int THRESHOLD_SHAKE_INTERVAL = 1000;
+    public static final int THRESHOLD_SHAKE_SPEED = 12;
+    private boolean isProcessingShake = false;
+    // sensor event listener
+    private SensorEventListener mSensorEventListener = new SensorEventListener() {
+        float[] accValues = null;
+        float[] magValues = null;
+        long lastShakeTime = 0;
+
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            switch (event.sensor.getType()) {
+                case Sensor.TYPE_ACCELEROMETER:
+                    // do something about values of accelerometer
+                    accValues = event.values.clone();
+
+                    long curTime = System.currentTimeMillis();
+                    if ((curTime - lastShakeTime) >= THRESHOLD_SHAKE_INTERVAL) {
+                        lastShakeTime = curTime;
+                        if ((Math.abs(accValues[0]) > THRESHOLD_SHAKE_SPEED
+                                || Math.abs(accValues[1]) > THRESHOLD_SHAKE_SPEED
+                                || Math.abs(accValues[2]) > THRESHOLD_SHAKE_SPEED)) {
+                            if (!isProcessingShake) {
+                                isProcessingShake = true;
+
+                                Toast.makeText(Player.this, "切换到下一首歌", Toast.LENGTH_SHORT).show();
+                                nextSong();
+
+                                isProcessingShake = false;
+                            }
+                        }
+                    }
+
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        }
+    };
 
     private final class InnerOnCompletionListener implements MediaPlayer.OnCompletionListener {
         @Override
@@ -123,6 +175,7 @@ public class Player extends AppCompatActivity  {
         }
     };
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -139,6 +192,9 @@ public class Player extends AppCompatActivity  {
         total=(TextView) findViewById(R.id.total);
         t=(TextView) findViewById(R.id.t);
         a=(TextView) findViewById(R.id.a);
+
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         music = new Music();
         infos = music.getInfos(Player.this.getContentResolver());
@@ -316,6 +372,17 @@ public class Player extends AppCompatActivity  {
         //seekBar.setProgress(ms.mp.getCurrentPosition());
         //seekBar.setMax(ms.mp.getDuration());
         super.onResume();
+
+        // register accelerometer sensor into sensor manager
+        mSensorManager.registerListener(mSensorEventListener, mAccelerometerSensor,
+                SensorManager.SENSOR_DELAY_GAME);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // unregister sensors
+        mSensorManager.unregisterListener(mSensorEventListener);
     }
 
     public void nextSong(){
