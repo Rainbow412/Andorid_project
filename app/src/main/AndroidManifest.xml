@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="android.project">
+
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
@@ -12,8 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <!--主程序 音乐列表-->
-        <activity android:name=".MainActivity"
+        <!-- 主程序 音乐列表 -->
+        <activity
+            android:name=".MainActivity"
             android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,27 +24,43 @@
             </intent-filter>
         </activity>
 
-        <!--音乐播放器-->
-        <activity android:name=".Player"
-            android:launchMode="singleInstance"/>
+        <!-- 音乐播放器 -->
+        <activity
+            android:name=".Player"
+            android:launchMode="singleInstance" />
 
-        <!--铃声修改页面-->
-        <activity android:name=".RingtoneEditActivity"
-            android:theme="@android:style/Theme.Holo"/>
-            <!--android:theme="@android:style/Theme.WithActionBar"/>-->
-
+        <!-- 铃声修改页面 -->
+        <activity
+            android:name=".RingtoneEditActivity"
+            android:theme="@android:style/Theme.Holo" />
+        <!-- android:theme="@android:style/Theme.WithActionBar"/> -->
 
         <receiver android:name=".NotificationReceiver">
             <intent-filter>
-                <action android:name="android.project.notification"/>
+                <action android:name="android.project.notification" />
+                <action android:name="android.project.cancelnotification" />
+                <action android:name="android.project.presong" />
+                <action android:name="android.project.nextsong" />
+                <action android:name="android.project.playpause" />
             </intent-filter>
         </receiver>
-
 
         <service
             android:name=".MusicService"
             android:enabled="true"
             android:exported="true" />
+
+        <receiver android:name=".MusicWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.project.notification"/>
+                <action android:name="android.project.cancelnotification" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/music_widget_info" />
+        </receiver>
     </application>
 
 </manifest>

@@ -1,5 +1,6 @@
 package android.project;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.DialogInterface;
@@ -33,6 +34,8 @@ import java.util.ListIterator;
 
 public class MainActivity extends AppCompatActivity {
 
+    static Activity ActivityA;
+
     private ListView listView;
     private Music music;
     private List<Info> infos;
@@ -58,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ActivityA = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //启动页面，进行功能说明

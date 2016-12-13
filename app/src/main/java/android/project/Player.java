@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.preference.DialogPreference;
+import android.support.annotation.MainThread;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,7 +27,12 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-public class Player extends AppCompatActivity {
+
+
+public class Player extends AppCompatActivity  {
+
+    private String CACELNOTI = "android.project.cancelnotification";
+
     private Button play;
     private Button stop;
     private Button quit;
@@ -227,10 +233,20 @@ public class Player extends AppCompatActivity {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         handler.removeCallbacks(runnable);
+                                        ms.mp.stop();
                                         unbindService(sc);
+                                        Intent intent1 = new Intent(CACELNOTI);
+                                        sendBroadcast(intent1);
                                         Intent intent = getIntent();
                                         setResult(1, intent);
-                                        finish();
+                                        try{
+                                            Player.this.finish();
+//                                            System.exit(0);
+                                        }catch (Exception e){
+                                            e.printStackTrace();
+                                        }
+//                                        ActivityA a = new ActivityA();
+//                                        a.ActivityA.finish();
                                     }
                                 }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
@@ -242,35 +258,48 @@ public class Player extends AppCompatActivity {
         });
     }
 
-
-
-    //按返回键1次：返回列表；连续按2次，退出程序。
-    //对系统返回键进行监听,定义一个变量记录按键时间,通过计算时间差来实现该功能
-//    private long mExitTime;
+//    // 按下返回键的作用跟按下HOME效果一样；重新点击应用还是回到应用退出前的状态；
+//    @Override
 //    public boolean onKeyDown(int keyCode, KeyEvent event) {
-//        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
-//            if ((System.currentTimeMillis() - mExitTime) > 2000) {
-//                Toast.makeText(this, "再按一次退出应用", Toast.LENGTH_SHORT).show();
-//                mExitTime = System.currentTimeMillis();
-//                ms.mp.stop();
-//                Player.this.finish();
-//                //System.exit(0);
-//            } else {
-//                handler.removeCallbacks(runnable);
-//                unbindService(sc);
-//                Intent intent = getIntent();
-//                setResult(1, intent);
-//                finish();
-//            }
+//        if (keyCode == KeyEvent.KEYCODE_BACK) {
+//            moveTaskToBack(true);
 //            return true;
 //        }
 //        return super.onKeyDown(keyCode, event);
 //    }
+
+
+    //按返回键1次：返回列表；连续按2次，退出程序。
+    //对系统返回键进行监听,定义一个变量记录按键时间,通过计算时间差来实现该功能
+    private long mExitTime;
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+            if ((System.currentTimeMillis() - mExitTime) > 2000) {
+                Toast.makeText(this, "再按一次退出应用", Toast.LENGTH_SHORT).show();
+                mExitTime = System.currentTimeMillis();
+                ms.mp.stop();
+                Player.this.finish();
+                //System.exit(0);
+            } else {
+                handler.removeCallbacks(runnable);
+                unbindService(sc);
+                Intent intent = getIntent();
+                setResult(1, intent);
+                finish();
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
     @Override
     public void onDestroy() {
         Intent intent = getIntent();
         setResult(0, intent);
         super.onDestroy();
+        Intent intent1 = new Intent(CACELNOTI);
+        sendBroadcast(intent1);
+
     }
 
     @Override
@@ -289,9 +318,10 @@ public class Player extends AppCompatActivity {
         super.onResume();
     }
 
-    void nextSong(){
+    public void nextSong(){
         handler.removeCallbacks(runnable);
-        unbindService(sc);
+        if(sc!=null)
+            unbindService(sc);
         position++;
         t.setText(title[position]);
         a.setText(artist[position]);
@@ -309,9 +339,10 @@ public class Player extends AppCompatActivity {
         bindService(intent, sc, BIND_AUTO_CREATE);
     }
 
-    void preSong(){
+    public void preSong(){
         handler.removeCallbacks(runnable);
-        unbindService(sc);
+        if(sc!=null)
+            unbindService(sc);
         position--;
         t.setText(title[position]);
         a.setText(artist[position]);
@@ -329,16 +360,7 @@ public class Player extends AppCompatActivity {
         bindService(intent, sc, BIND_AUTO_CREATE);
     }
 
-    //仅当activity为task根（即首个启动activity）时才生效 这个方法不会改变task中的activity状态，
-    // 按下返回键的作用跟按下HOME效果一样；重新点击应用还是回到应用退出前的状态；
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
-            moveTaskToBack(true);
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
+
 
 
 }
