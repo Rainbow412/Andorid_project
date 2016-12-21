@@ -1,5 +1,10 @@
 <resources>
     <string name="app_name">CutMusic</string>
-    <string name="appwidget_text">EXAMPLE</string>
-    <string name="add_widget">Add widget</string>
+
+    <string name="edit_info">
+        1. 滑动屏幕上的左右滑块，确定剪辑范围\n
+        2. 播放键可播放剪辑范围内的音乐；左/右按键可以实现播放的后退/前进\n
+        3. 保存后可选择保存文件类型为铃声、音乐、闹钟铃声、通知铃声\n
+        4. 保存成功后可选择是否直接设置为默认铃声。
+</string>
 </resources>

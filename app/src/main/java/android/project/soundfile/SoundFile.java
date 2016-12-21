@@ -1,5 +1,3 @@
-package android.project.soundfile;
-
 /*
  * Copyright (C) 2015 Google Inc.
  *
@@ -16,19 +14,12 @@ package android.project.soundfile;
  * limitations under the License.
  */
 
-import android.media.AudioFormat;
-import android.media.AudioRecord;
-import android.media.MediaCodec;
-import android.media.MediaExtractor;
-import android.media.MediaFormat;
-import android.media.MediaRecorder;
-import android.os.Environment;
-import android.util.Log;
+package android.project.soundfile;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -36,6 +27,16 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
 import java.util.Arrays;
+
+import android.media.AudioFormat;
+import android.media.AudioRecord;
+import android.media.MediaCodec;
+import android.media.MediaExtractor;
+import android.media.MediaFormat;
+import android.media.MediaRecorder;
+import android.os.Build;
+import android.os.Environment;
+import android.util.Log;
 
 public class SoundFile {
     private ProgressListener mProgressListener = null;
@@ -172,7 +173,15 @@ public class SoundFile {
 
     public ShortBuffer getSamples() {
         if (mDecodedSamples != null) {
-            return mDecodedSamples.asReadOnlyBuffer();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+//                    && Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1
+                    ) {
+                // Hack for Nougat where asReadOnlyBuffer fails to respect byte ordering.
+                // See https://code.google.com/p/android/issues/detail?id=223824
+                return mDecodedSamples;
+            } else {
+                return mDecodedSamples.asReadOnlyBuffer();
+            }
         } else {
             return null;
         }

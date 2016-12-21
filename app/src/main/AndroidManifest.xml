@@ -15,6 +15,7 @@
 
         <!-- 主程序 音乐列表 -->
         <activity
+            android:screenOrientation="portrait"
             android:name=".MainActivity"
             android:launchMode="singleInstance">
             <intent-filter>
@@ -26,11 +27,14 @@
 
         <!-- 音乐播放器 -->
         <activity
+            android:screenOrientation="portrait"
             android:name=".Player"
             android:launchMode="singleInstance" />
 
         <!-- 铃声修改页面 -->
         <activity
+            android:screenOrientation="portrait"
+            android:launchMode="singleInstance"
             android:name=".RingtoneEditActivity"
             android:theme="@android:style/Theme.Holo" />
         <!-- android:theme="@android:style/Theme.WithActionBar"/> -->
@@ -39,9 +43,10 @@
             <intent-filter>
                 <action android:name="android.project.notification" />
                 <action android:name="android.project.cancelnotification" />
-                <action android:name="android.project.presong" />
-                <action android:name="android.project.nextsong" />
+                <!--<action android:name="android.project.presong" />-->
+                <!--<action android:name="android.project.nextsong" />-->
                 <action android:name="android.project.playpause" />
+                <action android:name="android.project.stop" />
             </intent-filter>
         </receiver>
 
@@ -56,7 +61,6 @@
                 <action android:name="android.project.notification"/>
                 <action android:name="android.project.cancelnotification" />
             </intent-filter>
-
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/music_widget_info" />

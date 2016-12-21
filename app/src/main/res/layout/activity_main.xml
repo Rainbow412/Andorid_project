@@ -7,11 +7,10 @@
     <RelativeLayout
         android:id="@+id/splashLayout"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/app_name"/>
+        android:layout_height="fill_parent"
+        android:background="@drawable/image1">
+
+
     </RelativeLayout>
     <!-- 主界面 -->
     <RelativeLayout
@@ -20,9 +19,9 @@
         android:layout_height="wrap_content"
         android:paddingLeft="16dp"
         android:background="@color/timecode_shadow">
-    <ListView
-        android:id="@+id/listview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-</RelativeLayout>
+        <ListView
+            android:id="@+id/listview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </RelativeLayout>
 </ViewFlipper>

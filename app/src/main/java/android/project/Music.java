@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,8 +65,8 @@ public class Music {
         return infos;
     }
 
-    public void setMusicAdpter(Context context,List<Info> infos,ListView mMusicList) {
-        MusicAdapter mAdapter = new MusicAdapter(context, infos);
-        mMusicList.setAdapter(mAdapter);
-    }
+//    public void setMusicAdpter(Context context,List<Info> infos,ListView mMusicList) {
+//        MusicAdapter mAdapter = new MusicAdapter(context, infos);
+//        mMusicList.setAdapter(mAdapter);
+//    }
 }

@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
@@ -27,7 +28,8 @@ public class MusicService extends Service {
 
 
     private String NOTIACTION = "android.project.notification";
-
+    private String PLAYPAUSE = "android.project.playpause";
+    private String STOP = "android.project.stop";
 
     public final IBinder binder=new MyBinder();
     @Override
@@ -38,6 +40,7 @@ public class MusicService extends Service {
         title = bundle.getString("title");
         artist = bundle.getString("artist");
         position = bundle.getInt("position");
+        Log.d("position in MS", ""+position);
 
         //position=intent.getStringExtra("position");
         //System.out.println("sevice---------------"+path);
@@ -76,23 +79,27 @@ public class MusicService extends Service {
 
 
     public void play(){
-        if(mp.isPlaying()){
-            mp.pause();
-        } else{
-            mp.start();
-        }
+//        if(mp.isPlaying()){
+//            mp.pause();
+//        } else{
+//            mp.start();
+//        }
+        Intent intent = new Intent(PLAYPAUSE);
+        sendBroadcast(intent);
     }
 
     public void stop(){
-        if(mp!=null) {
-            mp.stop();
-            try {
-                mp.prepare();
-                mp.seekTo(0);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+//        if(mp!=null) {
+//            mp.stop();
+//            try {
+//                mp.prepare();
+//                mp.seekTo(0);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+        Intent intent = new Intent(STOP);
+        sendBroadcast(intent);
     }
 
     void notificationBroadcast(){

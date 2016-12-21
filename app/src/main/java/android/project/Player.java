@@ -41,6 +41,7 @@ public class Player extends AppCompatActivity  {
 
     private String CACELNOTI = "android.project.cancelnotification";
 
+
     private Button play;
     private Button stop;
     private Button quit;
@@ -74,14 +75,12 @@ public class Player extends AppCompatActivity  {
     // sensor event listener
     private SensorEventListener mSensorEventListener = new SensorEventListener() {
         float[] accValues = null;
-        float[] magValues = null;
         long lastShakeTime = 0;
 
         @Override
         public void onSensorChanged(SensorEvent event) {
             switch (event.sensor.getType()) {
                 case Sensor.TYPE_ACCELEROMETER:
-                    // do something about values of accelerometer
                     accValues = event.values.clone();
 
                     long curTime = System.currentTimeMillis();
@@ -100,7 +99,6 @@ public class Player extends AppCompatActivity  {
                             }
                         }
                     }
-
                     break;
                 default:
                     break;
@@ -138,6 +136,15 @@ public class Player extends AppCompatActivity  {
             total.setText(mt.format(ms.mp.getDuration()));
             seekBar.setProgress(ms.mp.getCurrentPosition());
             seekBar.setMax(ms.mp.getDuration());
+            if (MusicService.mp.isPlaying()) {
+                starting = true;
+                state.setText("正在播放");
+                play.setBackground(getResources().getDrawable(R.mipmap.pause));
+
+            } else if(starting) {
+                state.setText("已暂停");
+                play.setBackground(getResources().getDrawable(R.mipmap.play));
+            }
 //            Log.d("getCurrentPosition", ""+ms.mp.getCurrentPosition());
 //            Log.d("getDuration", ""+ms.mp.getDuration());
 //            if (Math.abs(ms.mp.getCurrentPosition()-ms.mp.getDuration())<=120){
@@ -236,18 +243,20 @@ public class Player extends AppCompatActivity  {
             public void onClick(View view) {
                 ms.play();
                 starting=true;
-                if (MusicService.mp.isPlaying()) {
-                    state.setText("正在播放");
-                    play.setBackground(getResources().getDrawable(R.mipmap.pause));
-                } else {
-                    state.setText("已暂停");
-                    play.setBackground(getResources().getDrawable(R.mipmap.play));
-                }
+//                if (MusicService.mp.isPlaying()) {
+//                    state.setText("正在播放");
+//                    play.setBackground(getResources().getDrawable(R.mipmap.pause));
+//
+//                } else {
+//                    state.setText("已暂停");
+//                    play.setBackground(getResources().getDrawable(R.mipmap.play));
+//                }
             }
         });
         stop.setOnClickListener(new View.OnClickListener(){
             public void onClick(View view) {
                 ms.stop();
+                starting = false;
                 seekBar.setProgress(0);
                 play.setBackground(getResources().getDrawable(R.mipmap.play));
                 state.setText("已停止");
@@ -362,10 +371,12 @@ public class Player extends AppCompatActivity  {
     protected void onResume() {
         if(ms.mp.isPlaying()) {
             state.setText("正在播放");
+            play.setBackground(getResources().getDrawable(R.mipmap.pause));
         }
         else {
             if(starting){
                 state.setText("已暂停");
+                play.setBackground(getResources().getDrawable(R.mipmap.play));
             }
         }
         handler.post(runnable);

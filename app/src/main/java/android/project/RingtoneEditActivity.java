@@ -101,7 +101,6 @@ public class RingtoneEditActivity extends Activity
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
-
         Intent intent = getIntent();
         url = intent.getStringExtra("url");
 
@@ -166,34 +165,35 @@ public class RingtoneEditActivity extends Activity
         super.onDestroy();
     }
 
-    /**
-     * Called when the orientation changes and/or the keyboard is shown
-     * or hidden.  We don't need to recreate the whole activity in this
-     * case, but we do need to redo our layout somewhat.
-     */
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        final int saveZoomLevel = mWaveformView.getZoomLevel();
-        super.onConfigurationChanged(newConfig);
-
-        loadGui();
-
-        mHandler.postDelayed(new Runnable() {
-            public void run() {
-                mStartMarker.requestFocus();
-                markerFocus(mStartMarker);
-
-                mWaveformView.setZoomLevel(saveZoomLevel);
-                mWaveformView.recomputeHeights(mDensity);
-
-                updateDisplay();
-            }
-        }, 500);
-    }
+//    /**
+//     * Called when the orientation changes and/or the keyboard is shown
+//     * or hidden.  We don't need to recreate the whole activity in this
+//     * case, but we do need to redo our layout somewhat.
+//     */
+//    @Override
+//    public void onConfigurationChanged(Configuration newConfig) {
+//        final int saveZoomLevel = mWaveformView.getZoomLevel();
+//        super.onConfigurationChanged(newConfig);
+//
+//        loadGui();
+//
+//        mHandler.postDelayed(new Runnable() {
+//            public void run() {
+//                mStartMarker.requestFocus();
+//                markerFocus(mStartMarker);
+//
+//                mWaveformView.setZoomLevel(saveZoomLevel);
+//                mWaveformView.recomputeHeights(mDensity);
+//
+//                updateDisplay();
+//            }
+//        }, 500);
+//    }
 
     //生成右上角菜单
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.edit_options, menu);
 
@@ -219,22 +219,31 @@ public class RingtoneEditActivity extends Activity
                 updateDisplay();
                 return true;
             case R.id.action_about:
-//                onAbout(this);
+                onAbout(this);
                 return true;
             default:
                 return false;
         }
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_SPACE) {
-            onPlay(mStartPos);
-            return true;
-        }
-
-        return super.onKeyDown(keyCode, event);
+    public static void onAbout(final Activity activity){
+        new AlertDialog.Builder(activity)
+                .setTitle("操作说明")
+                .setMessage(activity.getString(R.string.edit_info))
+                .setPositiveButton("好",null)
+                .setCancelable(false)
+                .show();
     }
+
+//    @Override
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//        if (keyCode == KeyEvent.KEYCODE_SPACE) {
+//            onPlay(mStartPos);
+//            return true;
+//        }
+//
+//        return super.onKeyDown(keyCode, event);
+//    }
 
     //
     // WaveformListener
@@ -903,6 +912,7 @@ public class RingtoneEditActivity extends Activity
      * dialog is presented as an error, and the stack trace is
      * logged.  If there's no exception, it's a success message.
      */
+    //铃声保存后
     private void showFinalAlert(Exception e, CharSequence message) {
         CharSequence title;
         if (e != null) {
@@ -956,8 +966,6 @@ public class RingtoneEditActivity extends Activity
                 break;
         }
         String parentdir = externalRootDir + subdir;
-
-
 
         // Create the parent directory
         File parentDirFile = new File(parentdir);
@@ -1203,11 +1211,8 @@ public class RingtoneEditActivity extends Activity
 //            return;
 //        }
 
-        // There's nothing more to do with music
-        // Show a success message and then quit.
-        if (mNewFileKind == FileSaveDialog.FILE_KIND_MUSIC
-//                ||mNewFileKind == FileSaveDialog.FILE_KIND_ALARM
-                ) {
+        //保存为音乐后直接退出
+        if (mNewFileKind == FileSaveDialog.FILE_KIND_MUSIC) {
             Toast.makeText(this,
                     "保存成功",
                     Toast.LENGTH_SHORT)
@@ -1216,8 +1221,7 @@ public class RingtoneEditActivity extends Activity
             return;
         }
 
-        // If it's a alarm, give the user the option of making
-        // this their default alarm.  If they say no, we're finished.
+        //保存为闹钟铃声后询问是否设置为默认闹钟铃声
         if (mNewFileKind == FileSaveDialog.FILE_KIND_ALARM) {
             new AlertDialog.Builder(RingtoneEditActivity.this)
                     .setTitle("保存成功")
@@ -1250,8 +1254,7 @@ public class RingtoneEditActivity extends Activity
             return;
         }
 
-        // If it's a notification, give the user the option of making
-        // this their default notification.  If they say no, we're finished.
+        ////保存为通知铃声后询问是否设置为默认通知铃声
         if (mNewFileKind == FileSaveDialog.FILE_KIND_NOTIFICATION) {
             new AlertDialog.Builder(RingtoneEditActivity.this)
                     .setTitle("保存成功")
@@ -1284,8 +1287,7 @@ public class RingtoneEditActivity extends Activity
             return;
         }
 
-        // If we get here, that means the type is a ringtone.
-        // There are 2 choices: make this your default ringtone or do nothing.
+        ////保存为铃声后询问是否设置为默认铃声
         if (mNewFileKind == FileSaveDialog.FILE_KIND_RINGTONE) {
             new AlertDialog.Builder(RingtoneEditActivity.this)
                     .setTitle("保存成功")

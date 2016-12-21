@@ -33,6 +33,10 @@ public class MusicAdapter extends BaseAdapter {
         this.infos = mp3Infos;
     }
 
+    public void refresh(List<Info> newInfos){
+        this.infos = newInfos;
+        notifyDataSetChanged();
+    }
 
     @Override
     public int getCount() {

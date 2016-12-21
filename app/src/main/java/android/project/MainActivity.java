@@ -34,7 +34,7 @@ import java.util.ListIterator;
 
 public class MainActivity extends AppCompatActivity {
 
-    static Activity ActivityA;
+//    static Activity ActivityA;
 
     private ListView listView;
     private Music music;
@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        ActivityA = this;
+//        ActivityA = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //启动页面，进行功能说明
@@ -76,7 +76,8 @@ public class MainActivity extends AppCompatActivity {
         music = new Music();
         infos = music.getInfos(MainActivity.this.getContentResolver());
         adapter = new MusicAdapter(getApplicationContext(), infos);
-        music.setMusicAdpter(getApplicationContext(), infos, listView);
+        listView.setAdapter(adapter);
+//        music.setMusicAdpter(getApplicationContext(), infos, listView);
 
 
         /*int size=infos.size();
@@ -94,10 +95,11 @@ public class MainActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Info info = infos.get(position);
+//                Info info = infos.get(position);
                 //System.out.println("position----------"+position);
                 Intent intent = new Intent(MainActivity.this, Player.class);
                 intent.putExtra("position",position);
+                Log.d("position", ""+position);
                 /*intent.putExtra("title", info.getTitle());
                 intent.putExtra("artist", info.getArtist());
                 intent.putExtra("url", info.getUrl());
@@ -169,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
                 startRingdroidEditor(url);
                 return true;
             case CMD_DELETE:
-                confirmDelete(url);
+                confirmDelete(url,minfo.position);
                 return true;
             default:
                 return super.onContextItemSelected(item);
@@ -187,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void confirmDelete(final String url) {
+    private void confirmDelete(final String url, final int p) {
 
         new AlertDialog.Builder(MainActivity.this)
 //                .setTitle("删除")
@@ -197,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog,
                                                 int whichButton) {
-                                onDelete(url);
+                                onDelete(url, p);
                             }
                         })
                 .setNegativeButton(
@@ -211,10 +213,15 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
-    private void onDelete(String url) {
+    private void onDelete(String url, int p) {
         File musicfile = new File(url);
-        if(musicfile.isFile())
+        if(musicfile.isFile()){
             musicfile.delete();
+        }
+        getContentResolver().delete(Uri.parse(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI+
+                "/"+infos.get(p).getId()),null,null);
+        infos.remove(p);
+        adapter.refresh(infos);
     }
 
 
