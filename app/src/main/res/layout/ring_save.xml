@@ -40,13 +40,19 @@
 
         <Button android:id="@+id/save"
             android:text="保存"
-            android:layout_width="100sp"
+            android:layout_width="60sp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dip" />
+
+        <Button android:id="@+id/save_and_set"
+            android:text="保存并设为铃声"
+            android:layout_width="200sp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dip" />
 
         <Button android:id="@+id/cancel"
             android:text="取消"
-            android:layout_width="100sp"
+            android:layout_width="60sp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dip" />
 

@@ -25,9 +25,11 @@ public class Music {
 
             String title = cursor.getString((cursor
                     .getColumnIndex(MediaStore.Audio.Media.TITLE)));//音乐标题
+            Log.d("title", title);
 
             String artist = cursor.getString(cursor
                     .getColumnIndex(MediaStore.Audio.Media.ARTIST));//艺术家
+            Log.d("artist", artist);
 
             long duration = cursor.getLong(cursor
                     .getColumnIndex(MediaStore.Audio.Media.DURATION));//时长
@@ -47,10 +49,13 @@ public class Music {
             int isMusic = cursor.getInt(cursor
                     .getColumnIndex(MediaStore.Audio.Media.IS_MUSIC));//是否为音乐
 
+            int isRing = cursor.getInt(cursor
+                    .getColumnIndex(MediaStore.Audio.Media.IS_RINGTONE));//是否为铃声
+            Log.d("isRing", ""+isRing);
 
 
             //if (isMusic != 0 && duration/(1000*60)>=1) {     //只把1分钟以上的音乐添加到集合当中
-            if (isMusic != 0 && duration>=30000) {  //只把30秒以上的音乐添加到集合当中
+            if ((isMusic != 0 && duration>=30000)) {  //只把30秒以上的音乐添加到集合当中
                 info.setId(id);
                 info.setTitle(title);
                 info.setArtist(artist);

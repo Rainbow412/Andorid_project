@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -59,6 +60,10 @@ public class FileSaveDialog extends Dialog {
         // Inflate our UI from its XML layout description.
         setContentView(R.layout.ring_save);
 
+        Button save = (Button)findViewById(R.id.save);
+        final Button save_and_set = (Button)findViewById(R.id.save_and_set);
+        Button cancel = (Button)findViewById(R.id.cancel);
+
         setTitle("保存为：");
 
         mTypeArray = new ArrayList<String>();
@@ -87,14 +92,28 @@ public class FileSaveDialog extends Dialog {
                                        int position,
                                        long id) {
                 setFilenameEditBoxFromName(true);
+                Log.d("position in dialog", ""+position);
+
+                if(position==0){
+                    //选择文件类型为音乐
+                    save_and_set.setText("保存并分享");
+                }else if(position==1){
+                    //选择类型为闹钟铃声
+                    save_and_set.setText("保存并设为闹钟铃声");
+                }else if(position==2){
+                    //选择类型为通知铃声
+                    save_and_set.setText("保存并设为通知铃声");
+                }else if(position==3){
+                    save_and_set.setText("保存并设为铃声");
+                }
             }
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
 
-        Button save = (Button)findViewById(R.id.save);
+
         save.setOnClickListener(saveListener);
-        Button cancel = (Button)findViewById(R.id.cancel);
+        save_and_set.setOnClickListener(saveandsetListener);
         cancel.setOnClickListener(cancelListener);
         mResponse = response;
     }
@@ -120,6 +139,17 @@ public class FileSaveDialog extends Dialog {
         public void onClick(View view) {
             mResponse.obj = mFilename.getText();
             mResponse.arg1 = mTypeSpinner.getSelectedItemPosition();
+            mResponse.arg2 = 0;
+            mResponse.sendToTarget();
+            dismiss();
+        }
+    };
+
+    private View.OnClickListener saveandsetListener = new View.OnClickListener() {
+        public void onClick(View view) {
+            mResponse.obj = mFilename.getText();
+            mResponse.arg1 = mTypeSpinner.getSelectedItemPosition();
+            mResponse.arg2 = 1;
             mResponse.sendToTarget();
             dismiss();
         }

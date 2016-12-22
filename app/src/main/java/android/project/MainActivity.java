@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     // Context menu
     private static final int CMD_EDIT = 4;
     private static final int CMD_DELETE = 5;
+    private static final int CMD_SHARE = 6;
 
     //启动页面，进行功能说明
     private ViewFlipper allFlipper;
@@ -156,6 +157,7 @@ public class MainActivity extends AppCompatActivity {
 //        menu.setHeaderTitle(title);
 
         menu.add(0, CMD_EDIT, 0, "剪辑铃声");
+        menu.add(0, CMD_SHARE, 0, "分享");
         menu.add(0, CMD_DELETE, 0, "删除");
     }
 
@@ -172,6 +174,14 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case CMD_DELETE:
                 confirmDelete(url,minfo.position);
+                return true;
+            case CMD_SHARE:
+                File file = new File(url);
+                Intent share = new Intent(Intent.ACTION_SEND);
+                share.putExtra(Intent.EXTRA_STREAM,
+                        Uri.fromFile(file));
+                share.setType("*/*");//此处可发送多种文件
+                startActivity(Intent.createChooser(share, "分享方式"));
                 return true;
             default:
                 return super.onContextItemSelected(item);

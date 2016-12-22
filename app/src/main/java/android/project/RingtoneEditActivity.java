@@ -96,6 +96,8 @@ public class RingtoneEditActivity extends Activity
     private Thread mLoadSoundFileThread;
     private Thread mSaveSoundFileThread;
 
+    private  boolean ifSet = false;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -1154,7 +1156,7 @@ public class RingtoneEditActivity extends Activity
 
     //保存文件后
     private void afterSavingRingtone(CharSequence title,
-                                     String outPath,
+                                     final String outPath,
                                      int duration) {
         File outFile = new File(outPath);
         long fileSize = outFile.length();
@@ -1217,28 +1219,34 @@ public class RingtoneEditActivity extends Activity
                     "保存成功",
                     Toast.LENGTH_SHORT)
                     .show();
+            if(ifSet){
+                shareFile(outPath);
+            }
             finish();
             return;
         }
 
         //保存为闹钟铃声后询问是否设置为默认闹钟铃声
         if (mNewFileKind == FileSaveDialog.FILE_KIND_ALARM) {
+            if(ifSet){
+                RingtoneManager.setActualDefaultRingtoneUri(
+                        RingtoneEditActivity.this,
+                        RingtoneManager.TYPE_ALARM,
+                        newUri);
+                Toast.makeText(
+                        RingtoneEditActivity.this,
+                        "成功设置为闹钟铃声",
+                        Toast.LENGTH_SHORT)
+                        .show();
+            }
             new AlertDialog.Builder(RingtoneEditActivity.this)
                     .setTitle("保存成功")
-                    .setMessage("是否设置为默认闹钟铃声?")
+                    .setMessage("是否分享?")
                     .setPositiveButton("好",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog,
                                                     int whichButton) {
-                                    RingtoneManager.setActualDefaultRingtoneUri(
-                                            RingtoneEditActivity.this,
-                                            RingtoneManager.TYPE_ALARM,
-                                            newUri);
-                                    Toast.makeText(
-                                            RingtoneEditActivity.this,
-                                            "成功设置为闹钟铃声",
-                                            Toast.LENGTH_SHORT)
-                                            .show();
+                                    shareFile(outPath);
                                     finish();
                                 }
                             })
@@ -1249,29 +1257,59 @@ public class RingtoneEditActivity extends Activity
                                     finish();
                                 }
                             })
-                    .setCancelable(false)
                     .show();
+//            new AlertDialog.Builder(RingtoneEditActivity.this)
+//                    .setTitle("保存成功")
+//                    .setMessage("是否设置为默认闹钟铃声?")
+//                    .setPositiveButton("好",
+//                            new DialogInterface.OnClickListener() {
+//                                public void onClick(DialogInterface dialog,
+//                                                    int whichButton) {
+//                                    RingtoneManager.setActualDefaultRingtoneUri(
+//                                            RingtoneEditActivity.this,
+//                                            RingtoneManager.TYPE_ALARM,
+//                                            newUri);
+//                                    Toast.makeText(
+//                                            RingtoneEditActivity.this,
+//                                            "成功设置为闹钟铃声",
+//                                            Toast.LENGTH_SHORT)
+//                                            .show();
+//                                    finish();
+//                                }
+//                            })
+//                    .setNegativeButton(
+//                            "不用了",
+//                            new DialogInterface.OnClickListener() {
+//                                public void onClick(DialogInterface dialog, int whichButton) {
+//                                    finish();
+//                                }
+//                            })
+//                    .setCancelable(false)
+//                    .show();
             return;
         }
 
         ////保存为通知铃声后询问是否设置为默认通知铃声
         if (mNewFileKind == FileSaveDialog.FILE_KIND_NOTIFICATION) {
+            if(ifSet){
+                RingtoneManager.setActualDefaultRingtoneUri(
+                        RingtoneEditActivity.this,
+                        RingtoneManager.TYPE_NOTIFICATION,
+                        newUri);
+                Toast.makeText(
+                        RingtoneEditActivity.this,
+                        "成功设置为通知铃声",
+                        Toast.LENGTH_SHORT)
+                        .show();
+            }
             new AlertDialog.Builder(RingtoneEditActivity.this)
                     .setTitle("保存成功")
-                    .setMessage("是否设置为默认通知铃声?")
+                    .setMessage("是否分享?")
                     .setPositiveButton("好",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog,
                                                     int whichButton) {
-                                    RingtoneManager.setActualDefaultRingtoneUri(
-                                            RingtoneEditActivity.this,
-                                            RingtoneManager.TYPE_NOTIFICATION,
-                                            newUri);
-                                    Toast.makeText(
-                                            RingtoneEditActivity.this,
-                                            "成功设置为通知铃声",
-                                            Toast.LENGTH_SHORT)
-                                            .show();
+                                    shareFile(outPath);
                                     finish();
                                 }
                             })
@@ -1282,29 +1320,59 @@ public class RingtoneEditActivity extends Activity
                                     finish();
                                 }
                             })
-                    .setCancelable(false)
                     .show();
+//            new AlertDialog.Builder(RingtoneEditActivity.this)
+//                    .setTitle("保存成功")
+//                    .setMessage("是否设置为默认通知铃声?")
+//                    .setPositiveButton("好",
+//                            new DialogInterface.OnClickListener() {
+//                                public void onClick(DialogInterface dialog,
+//                                                    int whichButton) {
+//                                    RingtoneManager.setActualDefaultRingtoneUri(
+//                                            RingtoneEditActivity.this,
+//                                            RingtoneManager.TYPE_NOTIFICATION,
+//                                            newUri);
+//                                    Toast.makeText(
+//                                            RingtoneEditActivity.this,
+//                                            "成功设置为通知铃声",
+//                                            Toast.LENGTH_SHORT)
+//                                            .show();
+//                                    finish();
+//                                }
+//                            })
+//                    .setNegativeButton(
+//                            "不用了",
+//                            new DialogInterface.OnClickListener() {
+//                                public void onClick(DialogInterface dialog, int whichButton) {
+//                                    finish();
+//                                }
+//                            })
+//                    .setCancelable(false)
+//                    .show();
             return;
         }
 
         ////保存为铃声后询问是否设置为默认铃声
         if (mNewFileKind == FileSaveDialog.FILE_KIND_RINGTONE) {
+            if(ifSet){
+                RingtoneManager.setActualDefaultRingtoneUri(
+                        RingtoneEditActivity.this,
+                        RingtoneManager.TYPE_RINGTONE,
+                        newUri);
+                Toast.makeText(
+                        RingtoneEditActivity.this,
+                        "成功设置为铃声",
+                        Toast.LENGTH_SHORT)
+                        .show();
+            }
             new AlertDialog.Builder(RingtoneEditActivity.this)
                     .setTitle("保存成功")
-                    .setMessage("是否设置为默认铃声?")
+                    .setMessage("是否分享?")
                     .setPositiveButton("好",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog,
                                                     int whichButton) {
-                                    RingtoneManager.setActualDefaultRingtoneUri(
-                                            RingtoneEditActivity.this,
-                                            RingtoneManager.TYPE_RINGTONE,
-                                            newUri);
-                                    Toast.makeText(
-                                            RingtoneEditActivity.this,
-                                            "成功设置为铃声",
-                                            Toast.LENGTH_SHORT)
-                                            .show();
+                                    shareFile(outPath);
                                     finish();
                                 }
                             })
@@ -1315,8 +1383,36 @@ public class RingtoneEditActivity extends Activity
                                     finish();
                                 }
                             })
-                    .setCancelable(false)
                     .show();
+
+//            new AlertDialog.Builder(RingtoneEditActivity.this)
+//                    .setTitle("保存成功")
+//                    .setMessage("是否设置为默认铃声?")
+//                    .setPositiveButton("好",
+//                            new DialogInterface.OnClickListener() {
+//                                public void onClick(DialogInterface dialog,
+//                                                    int whichButton) {
+//                                    RingtoneManager.setActualDefaultRingtoneUri(
+//                                            RingtoneEditActivity.this,
+//                                            RingtoneManager.TYPE_RINGTONE,
+//                                            newUri);
+//                                    Toast.makeText(
+//                                            RingtoneEditActivity.this,
+//                                            "成功设置为铃声",
+//                                            Toast.LENGTH_SHORT)
+//                                            .show();
+//                                    finish();
+//                                }
+//                            })
+//                    .setNegativeButton(
+//                            "不用了",
+//                            new DialogInterface.OnClickListener() {
+//                                public void onClick(DialogInterface dialog, int whichButton) {
+//                                    finish();
+//                                }
+//                            })
+//                    .setCancelable(false)
+//                    .show();
             return;
         }
     }
@@ -1330,6 +1426,7 @@ public class RingtoneEditActivity extends Activity
             public void handleMessage(Message response) {
                 CharSequence newTitle = (CharSequence)response.obj;
                 mNewFileKind = response.arg1;
+                ifSet = (response.arg2==1);
                 saveRingtone(newTitle);
             }
         };
@@ -1433,6 +1530,15 @@ public class RingtoneEditActivity extends Activity
         StringWriter writer = new StringWriter();
         e.printStackTrace(new PrintWriter(writer));
         return writer.toString();
+    }
+
+    private void shareFile(String path){
+        File file = new File(path);
+        Intent share = new Intent(Intent.ACTION_SEND);
+        share.putExtra(Intent.EXTRA_STREAM,
+                Uri.fromFile(file));
+        share.setType("*/*");//此处可发送多种文件
+        startActivity(Intent.createChooser(share, "分享方式"));
     }
 
 }
