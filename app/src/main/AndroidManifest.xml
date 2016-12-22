@@ -60,6 +60,8 @@
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="android.project.notification"/>
                 <action android:name="android.project.cancelnotification" />
+                <action android:name="android.project.playpause" />
+                <action android:name="android.project.stop" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"

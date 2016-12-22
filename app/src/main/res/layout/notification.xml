@@ -6,6 +6,7 @@
 
     <ImageView
         android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
         android:id="@+id/noti_album"
         android:layout_width="60dp"
         android:layout_height="match_parent"
